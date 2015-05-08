@@ -53,5 +53,12 @@
     <None Include="COPYING" />
     <None Include="QuickStart.version" />
     <None Include="README.md" />
+    <None Include="GameData\QuickStart\COPYING" />
+    <None Include="GameData\QuickStart\QuickStart.version" />
+    <None Include="GameData\QuickStart\README.md" />
+    <None Include="GameData\QuickStart\Plugins\QuickStart.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GameData\" />
   </ItemGroup>
 </Project>
