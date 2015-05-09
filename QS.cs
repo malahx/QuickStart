@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace QuickStart {
@@ -40,9 +40,9 @@ namespace QuickStart {
 
 		private string LastSaveGameUsed {
 			get {
-				DirectoryInfo[] _directories = new DirectoryInfo (SaveFolder).GetDirectories ();
 				DateTime _lastWriteTime = DateTime.MinValue;
 				string _lastDirectoryUsed = string.Empty;
+				DirectoryInfo[] _directories = new DirectoryInfo (SaveFolder).GetDirectories ();
 				foreach (DirectoryInfo _directory in _directories) {
 					FileInfo[] _files = _directory.GetFiles ();
 					FileInfo _file = Array.Find (_files, f => f.Name == "persistent.sfs");
@@ -71,8 +71,8 @@ namespace QuickStart {
 			}
 			Instance = this;
 			DontDestroyOnLoad (Instance);
-			GameEvents.onLevelWasLoadedGUIReady.Add (OnLevelWasLoadedGUIReady);
 			lastSaveGameUsed = LastSaveGameUsed;
+			StartCoroutine (QStart ());
 		}
 			
 		private void Start() {
@@ -80,13 +80,14 @@ namespace QuickStart {
 		}
 
 		private void OnDestroy() {
-			GameEvents.onLevelWasLoadedGUIReady.Remove (OnLevelWasLoadedGUIReady);
+			Quick.Log ("Bye, have fun");
 		}
 
-		private void OnLevelWasLoadedGUIReady(GameScenes gameScene) {
-			if (gameScene != GameScenes.MAINMENU) {
-				return;
+		private IEnumerator QStart() {
+			while (MainMenu.FindObjectOfType(typeof(MainMenu)) == null) {
+				yield return 0;
 			}
+			Quick.Log ("MainMenu Loaded");
 			if (QSettings.Instance.Enabled) {
 				if (!string.IsNullOrEmpty(lastSaveGameUsed)) {
 					Quick.Warning ("The last game found: " + lastSaveGameUsed);
@@ -98,25 +99,30 @@ namespace QuickStart {
 						}
 						HighLogic.CurrentGame.Start ();
 						Destroy (this);
-						return;
+						yield break;
 					} 
 				}
 				Quick.Warning ("Can't load the last save game");
 			}
-			Destroy (this);		
+			Destroy (this);
 		}
 
 		private void OnGUI() {
-			if (!string.IsNullOrEmpty(lastSaveGameUsed)) {
-				GUI.skin = HighLogic.Skin;
-				GUILayout.BeginArea (RectGUI);
-				bool _Enabled = GUILayout.Toggle (QSettings.Instance.Enabled, "Enable QuickStart to the last game: " + (lastSaveGameUsed != null ? lastSaveGameUsed : "Not found the last game"));
-				if (_Enabled != QSettings.Instance.Enabled) {
-					QSettings.Instance.Enabled = _Enabled;
-					QSettings.Instance.Save ();
-				}
-				GUILayout.EndArea ();
+			if (HighLogic.LoadedSceneIsGame) {
+				Destroy (this);
+				return;
 			}
+			if (string.IsNullOrEmpty (lastSaveGameUsed) || HighLogic.LoadedScene != GameScenes.LOADING) {
+				return;
+			}
+			GUI.skin = HighLogic.Skin;
+			GUILayout.BeginArea (RectGUI);
+			bool _Enabled = GUILayout.Toggle (QSettings.Instance.Enabled, "Enable QuickStart to the last game: " + (lastSaveGameUsed != null ? lastSaveGameUsed : "Not found the last game"));
+			if (_Enabled != QSettings.Instance.Enabled) {
+				QSettings.Instance.Enabled = _Enabled;
+				QSettings.Instance.Save ();
+			}
+			GUILayout.EndArea ();
 		}
 	}
 }

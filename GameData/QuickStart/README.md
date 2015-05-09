@@ -32,11 +32,10 @@ Unzip all files. Merge the new QuickStart folder with the old folder which is in
 
 Delete the QuickStart folder in your KSP/GameData folder.
 
-#### Troubleshooting?
-
-If you use a plugin which needs to work on the mainmenu, It can be blocked by QuickStart.
-
 #### Changelog
+
+v1.01 - 2015.05.09
+* Fix: Corrected the launch of QuickStart to allow others plugins to load at the Main menu.
 
 v1.00 - 2015.05.08
 * First release.
@@ -44,6 +43,7 @@ v1.00 - 2015.05.08
 #### Thanks!
 
 * to curiousepic and 5thHorseman to have requested this mod,
+* to sirkut for his mod Magic Smoke Industries DevHelper,
 * to all other mod developers which make this game really huge,
 * to my friend Neimad who corrects my bad english ...
 * and to Squad for this awesome game.
@@ -51,4 +51,6 @@ v1.00 - 2015.05.08
 #### Links
 
 * http://forum.kerbalspaceprogram.com/threads/95168#QuickStart
+* https://kerbalstuff.com/mod/763/QuickStart
 * https://github.com/malahx/QuickStart
+* Magic Smoke Industries DevHelper: http://forum.kerbalspaceprogram.com/threads/60880
