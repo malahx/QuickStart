@@ -28,6 +28,9 @@ namespace QuickStart {
 		internal static string FileConfig = KSPUtil.ApplicationRootPath + "GameData/" + Quick.MOD + "/Config.txt";
 
 		[Persistent] internal bool Enabled = true;
+		[Persistent] internal int GameScene = (int)GameScenes.SPACECENTER;
+		[Persistent] internal bool editorFacility = true;
+		[Persistent] internal bool otherScenes = true;
 
 		public void Save() {
 			ConfigNode _temp = ConfigNode.CreateConfigFromObject(this, new ConfigNode());

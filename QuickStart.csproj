@@ -8,7 +8,7 @@
     <RootNamespace>QuickStart</RootNamespace>
     <AssemblyName>QuickStart</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.01</ReleaseVersion>
+    <ReleaseVersion>1.10</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,10 +35,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\lib\1.02\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\lib\1.0.4\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\lib\1.02\UnityEngine.dll</HintPath>
+      <HintPath>..\lib\1.0.4\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

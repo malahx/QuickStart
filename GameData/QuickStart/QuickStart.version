@@ -1,1 +1,23 @@
 {"NAME":"QuickStart","URL":"https://raw.githubusercontent.com/malahx/QuickStart/master/QuickStart.version","DOWNLOAD":"https://github.com/malahx/QuickStart/releases","CHANGE_LOG_URL":"https://raw.githubusercontent.com/malahx/QuickStart/master/README.md","VERSION":{"MAJOR":1,"MINOR":0,"PATCH":1n,"BUILD":0},"KSP_VERSION":{"MAJOR":1,"MINOR":0,"PATCH":2}}
+{
+	"NAME": "QuickStart",
+	"URL": "https://raw.githubusercontent.com/malahx/QuickStart/master/QuickStart.version",
+	"CHANGE_LOG_URL": "https://raw.githubusercontent.com/malahx/QuickStart/master/README.md", 
+	"DOWNLOAD": "https://kerbalstuff.com/mod/763/QuickStart"
+	"VERSION":{"MAJOR":1,"MINOR":1,"PATCH":0,"BUILD":0},
+    "KSP_VERSION": {
+        "MAJOR": 1,
+        "MINOR": 0,
+        "PATCH": 4
+    },
+    "KSP_VERSION_MIN": {
+        "MAJOR": 1,
+        "MINOR": 0,
+        "PATCH": 0
+    },
+    "KSP_VERSION_MAX": {
+        "MAJOR": 1,
+        "MINOR": 0,
+        "PATCH": -1
+    }
+}

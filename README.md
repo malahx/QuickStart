@@ -1,5 +1,5 @@
 ﻿#### QuickStart
-#### A plugin for Kerbal Space Program 1.0.2
+#### A plugin for Kerbal Space Program 1.0.X
 #### Copyright 2015 Malah
 
 This program is free software: you can redistribute it and/or modify
@@ -33,6 +33,11 @@ Unzip all files. Merge the new QuickStart folder with the old folder which is in
 Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
+
+v1.10 - 2015.06.25
+* New: Added a start to VAB/SPH/TS/LastVessel (it can be disable on the config file),
+* Fix: Corrected the OnFocus locks,
+* Updated to KSP 1.0.X
 
 v1.01 - 2015.05.09
 * Fix: Corrected the launch of QuickStart to allow others plugins to load at the Main menu.
