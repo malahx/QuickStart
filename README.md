@@ -34,6 +34,9 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v1.11 - 2015.06.26
+* Fix: Corrected the start to VAB/SPH (thanks cipherpunks for this report).
+
 v1.10 - 2015.06.25
 * New: Added a start to VAB/SPH/TS/LastVessel (it can be disable on the config file),
 * Fix: Corrected the OnFocus locks,

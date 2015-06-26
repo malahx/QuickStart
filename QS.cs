@@ -114,12 +114,24 @@ namespace QuickStart {
 						if (GamePersistence.UpdateScenarioModules (HighLogic.CurrentGame)) {
 							GamePersistence.SaveGame (HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
 						}
+						// HighLogic.CurrentGame.Start (); doesn't want to work with startScene set to FLIGHT or EDITOR ...
 						if ((GameScenes)QSettings.Instance.GameScene != GameScenes.FLIGHT) {
-							HighLogic.CurrentGame.startScene = (GameScenes)QSettings.Instance.GameScene;
-							if (HighLogic.CurrentGame.startScene == GameScenes.EDITOR) {
+							HighLogic.CurrentGame.startScene = (GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR ? GameScenes.SPACECENTER : (GameScenes)QSettings.Instance.GameScene;
+							/*if (HighLogic.CurrentGame.startScene == GameScenes.EDITOR) {
 								HighLogic.CurrentGame.editorFacility = (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
 							}
+							if (HighLogic.CurrentGame.startScene == GameScenes.FLIGHT) {
+								HighLogic.CurrentGame.editorFacility = (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
+								HighLogic.CurrentGame.flightState.activeVesselIdx = HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv == lastProtoVessel);
+							}*/
 							HighLogic.CurrentGame.Start ();
+							if ((GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR) {
+								while (SpaceCenterMain.FindObjectOfType (typeof(SpaceCenterMain)) == null) {
+									yield return 0;
+								}
+								Quick.Log ("SpaceCenterMain Loaded");
+								EditorDriver.StartEditor (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
+							}
 						} else {
 							string _saveGame = GamePersistence.SaveGame (HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
 							FlightDriver.StartAndFocusVessel (_saveGame, HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv == lastProtoVessel));
@@ -135,11 +147,7 @@ namespace QuickStart {
 		}
 
 		private void OnGUI() {
-			if (HighLogic.LoadedSceneIsGame) {
-				Destroy (this);
-				return;
-			}
-			if (string.IsNullOrEmpty (lastSaveGameUsed) || HighLogic.LoadedScene != GameScenes.LOADING) {
+			if (string.IsNullOrEmpty (lastSaveGameUsed) || lastGameUsed == null || HighLogic.LoadedScene != GameScenes.LOADING) {
 				return;
 			}
 			GUI.skin = HighLogic.Skin;
