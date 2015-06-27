@@ -8,7 +8,7 @@
     <RootNamespace>QuickStart</RootNamespace>
     <AssemblyName>QuickStart</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.10</ReleaseVersion>
+    <ReleaseVersion>1.12</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

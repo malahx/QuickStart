@@ -29,10 +29,16 @@ namespace QuickStart {
 	public class QuickStart : Quick {
 
 		private string lastSaveGameUsed;
-		private Game lastGameUsed;
-		private ProtoVessel lastProtoVessel;
+		private string lastVessel;
 
-		public string SaveFolder = KSPUtil.ApplicationRootPath + "saves";
+		public string saveFolder = KSPUtil.ApplicationRootPath + "saves";
+		public string saveFile = "persistent";
+		public string saveExt = ".sfs";
+
+		public string[] gameBlackList = {
+			"scenarios",
+			"training"
+		};
 
 		private Rect RectGUI = new Rect(0, (Screen.height - 100), Screen.width, 100);
 
@@ -45,10 +51,10 @@ namespace QuickStart {
 			get {
 				DateTime _lastWriteTime = DateTime.MinValue;
 				string _lastDirectoryUsed = string.Empty;
-				DirectoryInfo[] _directories = new DirectoryInfo (SaveFolder).GetDirectories ();
+				DirectoryInfo[] _directories = new DirectoryInfo (saveFolder).GetDirectories ();
 				foreach (DirectoryInfo _directory in _directories) {
 					FileInfo[] _files = _directory.GetFiles ();
-					FileInfo _file = Array.Find (_files, f => f.Name == "persistent.sfs");
+					FileInfo _file = Array.Find (_files, f => f.Name == saveFile + saveExt);
 					if (_file != null) {
 						if (_file.LastWriteTime > _lastWriteTime) {
 							_lastWriteTime = _file.LastWriteTime;
@@ -59,7 +65,7 @@ namespace QuickStart {
 				if (string.IsNullOrEmpty(_lastDirectoryUsed)) {
 					return string.Empty;
 				}
-				if (_lastDirectoryUsed == "scenarios" || _lastDirectoryUsed == "training") {
+				if (gameBlackList.Contains(_lastDirectoryUsed)) {
 					return string.Empty;
 				}
 				return _lastDirectoryUsed;
@@ -69,11 +75,32 @@ namespace QuickStart {
 		private ProtoVessel LastProtoVessel(Game game) {
 			List<ProtoVessel> _pVessels = game.flightState.protoVessels;
 			var _pVesselsSort = from _pv in _pVessels orderby _pv.launchTime select _pv;
-			return _pVesselsSort.Last (pv => pVesselIsOK (pv));
+			return _pVesselsSort.Last (_pv => pVesselIsOK (_pv));
+		}
+		private string LastVesselName(ConfigNode gameNode) {
+			if (!gameNode.HasNode("GAME")) {
+				return string.Empty;
+			}
+			if (!gameNode.GetNode("GAME").HasNode("FLIGHTSTATE")) {
+				return string.Empty;
+			}
+			if (!gameNode.GetNode("GAME").GetNode("FLIGHTSTATE").HasNode("VESSEL")) {
+				return string.Empty;
+			}
+			ConfigNode[] _vessels = gameNode.GetNode("GAME").GetNode("FLIGHTSTATE").GetNodes ("VESSEL");
+			var _vesselsSort = from _v in _vessels orderby double.Parse(_v.GetValue("lct")) select _v;
+			ConfigNode _lastVessel = _vesselsSort.Last (_v => vesselNodeIsOK (_v));
+			if (_lastVessel == null) {
+				return string.Empty;
+			}
+			return _lastVessel.GetValue ("name");
 		}
 
 		private bool pVesselIsOK(ProtoVessel pv) {
 			return pv.vesselType != VesselType.Debris && pv.vesselType != VesselType.Flag && pv.vesselType != VesselType.SpaceObject && pv.vesselType != VesselType.Unknown;
+		}
+		private bool vesselNodeIsOK(ConfigNode pv) {
+			return pv.GetValue("type") != VesselType.Debris.ToString() && pv.GetValue("type") != VesselType.Flag.ToString() && pv.GetValue("type") != VesselType.SpaceObject.ToString() && pv.GetValue("type") != VesselType.Unknown.ToString();
 		}
 
 		private void Awake() {
@@ -90,56 +117,64 @@ namespace QuickStart {
 			
 		private void Start() {
 			QSettings.Instance.Load ();
-			if (!string.IsNullOrEmpty(lastSaveGameUsed)) {
-				lastGameUsed = GamePersistence.LoadGame ("persistent", lastSaveGameUsed, true, false);
-				lastProtoVessel = LastProtoVessel(lastGameUsed);
+			if (!string.IsNullOrEmpty (lastSaveGameUsed)) {
+				ConfigNode _saveGame = ConfigNode.Load (saveFolder + "/" + lastSaveGameUsed + "/" + saveFile + saveExt);
+				if (_saveGame != null) {
+					lastVessel = LastVesselName (_saveGame);
+				}
 			}
 		}
 
 		private void OnDestroy() {
-			Quick.Log ("Bye, have fun");
+			Quick.Log ("Destroy QuickStart Instance");
 		}
 
 		private IEnumerator QStart() {
-			while (MainMenu.FindObjectOfType(typeof(MainMenu)) == null) {
+			if (string.IsNullOrEmpty (lastSaveGameUsed)) {
+				Destroy (this);
+				yield break;
+			}
+			while (MainMenu.FindObjectOfType (typeof(MainMenu)) == null) {
 				yield return 0;
 			}
 			Quick.Log ("MainMenu Loaded");
 			if (QSettings.Instance.Enabled) {
-				if (!string.IsNullOrEmpty(lastSaveGameUsed) && lastGameUsed != null) {
-					Quick.Warning ("The last game found: " + lastSaveGameUsed);
-					HighLogic.CurrentGame = lastGameUsed;
-					if (HighLogic.CurrentGame != null) {
-						HighLogic.SaveFolder = lastSaveGameUsed;
-						if (GamePersistence.UpdateScenarioModules (HighLogic.CurrentGame)) {
-							GamePersistence.SaveGame (HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
+				Quick.Warning ("The last game found: " + lastSaveGameUsed);
+				HighLogic.CurrentGame = GamePersistence.LoadGame (saveFile, lastSaveGameUsed, true, false);
+				if (HighLogic.CurrentGame != null) {
+					HighLogic.SaveFolder = lastSaveGameUsed;
+					if (GamePersistence.UpdateScenarioModules (HighLogic.CurrentGame)) {
+						GamePersistence.SaveGame (HighLogic.CurrentGame, saveFile, HighLogic.SaveFolder, SaveMode.OVERWRITE);
+					}
+					ProtoVessel _pVessel = LastProtoVessel (HighLogic.CurrentGame);
+					// HighLogic.CurrentGame.Start (); doesn't want to work with startScene set to FLIGHT or EDITOR ...
+					if ((GameScenes)QSettings.Instance.GameScene != GameScenes.FLIGHT || _pVessel == null) {
+						if ((GameScenes)QSettings.Instance.GameScene == GameScenes.FLIGHT) {
+							Quick.Warning ("Can't find the last vessel");
 						}
-						// HighLogic.CurrentGame.Start (); doesn't want to work with startScene set to FLIGHT or EDITOR ...
-						if ((GameScenes)QSettings.Instance.GameScene != GameScenes.FLIGHT) {
-							HighLogic.CurrentGame.startScene = (GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR ? GameScenes.SPACECENTER : (GameScenes)QSettings.Instance.GameScene;
-							/*if (HighLogic.CurrentGame.startScene == GameScenes.EDITOR) {
+						HighLogic.CurrentGame.startScene = (GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR || (GameScenes)QSettings.Instance.GameScene == GameScenes.FLIGHT ? GameScenes.SPACECENTER : (GameScenes)QSettings.Instance.GameScene;
+						/*if (HighLogic.CurrentGame.startScene == GameScenes.EDITOR) {
 								HighLogic.CurrentGame.editorFacility = (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
 							}
 							if (HighLogic.CurrentGame.startScene == GameScenes.FLIGHT) {
 								HighLogic.CurrentGame.editorFacility = (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
 								HighLogic.CurrentGame.flightState.activeVesselIdx = HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv == lastProtoVessel);
 							}*/
-							HighLogic.CurrentGame.Start ();
-							if ((GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR) {
-								while (SpaceCenterMain.FindObjectOfType (typeof(SpaceCenterMain)) == null) {
-									yield return 0;
-								}
-								Quick.Log ("SpaceCenterMain Loaded");
-								EditorDriver.StartEditor (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
+						HighLogic.CurrentGame.Start ();
+						if ((GameScenes)QSettings.Instance.GameScene == GameScenes.EDITOR) {
+							while (SpaceCenterMain.FindObjectOfType (typeof(SpaceCenterMain)) == null) {
+								yield return 0;
 							}
-						} else {
-							string _saveGame = GamePersistence.SaveGame (HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
-							FlightDriver.StartAndFocusVessel (_saveGame, HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv == lastProtoVessel));
+							Quick.Log ("SpaceCenterMain Loaded");
+							EditorDriver.StartEditor (QSettings.Instance.editorFacility ? EditorFacility.VAB : EditorFacility.SPH);
 						}
-						InputLockManager.ClearControlLocks ();
-						Destroy (this);
-						yield break;
-					} 
+					} else {
+						string _saveGame = GamePersistence.SaveGame (HighLogic.CurrentGame, saveFile, HighLogic.SaveFolder, SaveMode.OVERWRITE);
+						FlightDriver.StartAndFocusVessel (_saveGame, HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv == _pVessel));
+					}
+					InputLockManager.ClearControlLocks ();
+					Destroy (this);
+					yield break;
 				}
 				Quick.Warning ("Can't load the last save game");
 			}
@@ -147,7 +182,7 @@ namespace QuickStart {
 		}
 
 		private void OnGUI() {
-			if (string.IsNullOrEmpty (lastSaveGameUsed) || lastGameUsed == null || HighLogic.LoadedScene != GameScenes.LOADING) {
+			if (string.IsNullOrEmpty (lastSaveGameUsed) || HighLogic.LoadedScene != GameScenes.LOADING) {
 				return;
 			}
 			GUI.skin = HighLogic.Skin;
@@ -197,17 +232,13 @@ namespace QuickStart {
 					}
 				}
 				GUILayout.FlexibleSpace ();
-				if (lastProtoVessel != null) {
-					if (GUILayout.Toggle (QSettings.Instance.GameScene == (int)GameScenes.FLIGHT, "Last Vessel: " + lastProtoVessel.vesselName + "(" + lastProtoVessel.vesselType + ")", GUILayout.Width (200))) {
-						if (QSettings.Instance.GameScene != (int)GameScenes.FLIGHT) {
-							QSettings.Instance.GameScene = (int)GameScenes.FLIGHT;
-							QSettings.Instance.Save ();
-						}
+				if (GUILayout.Toggle (QSettings.Instance.GameScene == (int)GameScenes.FLIGHT, "Last Vessel" + (!string.IsNullOrEmpty(lastVessel) ? ": " + lastVessel : "" ), GUILayout.Width (200))) {
+					if (QSettings.Instance.GameScene != (int)GameScenes.FLIGHT) {
+						QSettings.Instance.GameScene = (int)GameScenes.FLIGHT;
+						QSettings.Instance.Save ();
 					}
-					GUILayout.FlexibleSpace ();
-				} else if (QSettings.Instance.GameScene == (int)GameScenes.FLIGHT) {
-					QSettings.Instance.GameScene = (int)GameScenes.SPACECENTER;
 				}
+				GUILayout.FlexibleSpace ();
 			}
 			GUILayout.EndHorizontal ();
 			GUILayout.FlexibleSpace ();

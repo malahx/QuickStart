@@ -34,6 +34,10 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v1.12 - 2015.06.27
+* Fix: Corrected the loading of the last savegame (thanks Svm420 for this report),
+* Fix: Corrected the search of the last vessel used.
+
 v1.11 - 2015.06.26
 * Fix: Corrected the start to VAB/SPH (thanks cipherpunks for this report).
 
