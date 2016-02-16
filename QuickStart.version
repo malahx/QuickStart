@@ -2,7 +2,7 @@
 	"NAME": "QuickStart",
 	"URL": "https://raw.githubusercontent.com/malahx/QuickStart/master/QuickStart.version",
 	"CHANGE_LOG_URL": "https://raw.githubusercontent.com/malahx/QuickStart/master/README.md", 
-	"DOWNLOAD": "https://kerbalstuff.com/mod/763/QuickStart"
+	"DOWNLOAD": "https://kerbalstuff.com/mod/763/QuickStart",
 	"VERSION":{"MAJOR":1,"MINOR":1,"PATCH":2,"BUILD":0},
     "KSP_VERSION": {
         "MAJOR": 1,
