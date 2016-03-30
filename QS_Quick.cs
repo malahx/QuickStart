@@ -1,6 +1,6 @@
 ﻿/* 
 QuickStart
-Copyright 2015 Malah
+Copyright 2016 Malah
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ using UnityEngine;
 
 namespace QuickStart {
 
-	public class Quick : MonoBehaviour {
+	public partial class QuickStart : MonoBehaviour {
 
 		public readonly static string VERSION = Assembly.GetAssembly(typeof(QuickStart)).GetName().Version.Major + "." + Assembly.GetAssembly(typeof(QuickStart)).GetName().Version.Minor + Assembly.GetAssembly(typeof(QuickStart)).GetName().Version.Build;
 		public readonly static string MOD = Assembly.GetAssembly(typeof(QuickStart)).GetName().Name;

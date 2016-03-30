@@ -1,6 +1,6 @@
 ﻿#### QuickStart
-#### A plugin for Kerbal Space Program 1.0.X
-#### Copyright 2015 Malah
+#### A plugin for Kerbal Space Program
+#### Copyright 2016 Malah
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,6 +34,12 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v1.14-pre1 - 2016.03.30
+* New: Deleted the start to VAB/SPH/TS/LastVessel,
+* Compiled against KSP 1.1.0.1172
+
+v1.13 - Never released
+
 v1.12 - 2015.06.27
 * Fix: Corrected the loading of the last savegame (thanks Svm420 for this report),
 * Fix: Corrected the search of the last vessel used,
@@ -64,6 +70,6 @@ v1.00 - 2015.05.08
 #### Links
 
 * http://forum.kerbalspaceprogram.com/threads/95168#QuickStart
-* https://kerbalstuff.com/mod/763/QuickStart
+* http://spacedock.info/mod/110/QuickStart
 * https://github.com/malahx/QuickStart
 * Magic Smoke Industries DevHelper: http://forum.kerbalspaceprogram.com/threads/60880

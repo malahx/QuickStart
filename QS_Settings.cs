@@ -1,6 +1,6 @@
 ﻿/* 
 QuickStart
-Copyright 2015 Malah
+Copyright 2016 Malah
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,17 +25,14 @@ namespace QuickStart {
 
 		public readonly static QSettings Instance = new QSettings();
 
-		internal static string FileConfig = KSPUtil.ApplicationRootPath + "GameData/" + Quick.MOD + "/Config.txt";
+		internal static string FileConfig = KSPUtil.ApplicationRootPath + "GameData/" + QuickStart.MOD + "/Config.txt";
 
 		[Persistent] internal bool Enabled = true;
-		[Persistent] internal int GameScene = (int)GameScenes.SPACECENTER;
-		[Persistent] internal bool editorFacility = true;
-		[Persistent] internal bool otherScenes = true;
 
 		public void Save() {
 			ConfigNode _temp = ConfigNode.CreateConfigFromObject(this, new ConfigNode());
 			_temp.Save(FileConfig);
-			Quick.Log ("Settings Saved");
+			QuickStart.Log ("Settings Saved");
 		}
 		public void Load() {
 			if (File.Exists (FileConfig)) {
@@ -45,7 +42,7 @@ namespace QuickStart {
 				} catch {
 					Save ();
 				}
-				Quick.Log ("Settings Loaded");
+				QuickStart.Log ("Settings Loaded");
 			} else {
 				Save ();
 			}
