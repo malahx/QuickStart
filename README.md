@@ -34,6 +34,12 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v1.15 - 2016.04.19
+* Compiled against KSP 1.1.0.1230
+
+v1.14-pre2 - 2016.04.08
+* Compiled against KSP 1.1.0.1196
+
 v1.14-pre1 - 2016.03.30
 * New: Deleted the start to VAB/SPH/TS/LastVessel,
 * Compiled against KSP 1.1.0.1172

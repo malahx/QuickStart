@@ -57,16 +57,16 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\lib\1.1.0.1172\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\lib\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="KSPUtil">
-      <HintPath>..\lib\1.1.0.1172\KSPUtil.dll</HintPath>
+      <HintPath>..\lib\Managed\KSPUtil.dll</HintPath>
     </Reference>
     <Reference Include="System">
-      <HintPath>..\lib\1.1.0.1172\System.dll</HintPath>
+      <HintPath>..\lib\Managed\System.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\lib\1.1.0.1172\UnityEngine.dll</HintPath>
+      <HintPath>..\lib\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
