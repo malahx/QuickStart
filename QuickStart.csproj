@@ -38,8 +38,13 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QS.cs" />
-    <Compile Include="QS_Quick.cs" />
     <Compile Include="QS_Settings.cs" />
+    <Compile Include="QS_MainMenu.cs" />
+    <Compile Include="QS_Loading.cs" />
+    <Compile Include="QS_SaveGame.cs" />
+    <Compile Include="QS_SpaceCenter.cs" />
+    <Compile Include="QS_Persistent.cs" />
+    <Compile Include="QS_Flight.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

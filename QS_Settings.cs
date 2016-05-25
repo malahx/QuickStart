@@ -21,18 +21,36 @@ using System.IO;
 using UnityEngine;
 
 namespace QuickStart {
-	public class QSettings : MonoBehaviour {
+	public class QSettings : QuickStart {
 
-		public readonly static QSettings Instance = new QSettings();
+		[KSPField(isPersistant = true)]	private static readonly QSettings instance = new QSettings ();
+		public static QSettings Instance {
+			get {
+				if (!instance.isLoaded) {
+					instance.Load ();
+				}
+				return instance;
+			}
+		}
 
-		internal static string FileConfig = KSPUtil.ApplicationRootPath + "GameData/" + QuickStart.MOD + "/Config.txt";
+		internal static readonly string FileConfig = KSPUtil.ApplicationRootPath + "GameData/" + MOD + "/Config.txt";
+
+		[KSPField(isPersistant = true)]	private bool isLoaded = false;
 
 		[Persistent] internal bool Enabled = true;
+		[Persistent] internal bool Debug = true;
+		[Persistent] internal float WaitLoading = 0.5f;
+		[Persistent] internal float editorTimeToSave = 30;
+		[Persistent] internal bool enableEditorAutoSaveShip = true;
+		[Persistent] internal bool enableEditorLoadAutoSave = true;
+		[Persistent] internal bool enablePauseOnFlight = true;
+		[Persistent] internal int gameScene = (int)GameScenes.SPACECENTER;
+		[Persistent] internal int editorFacility = (int)EditorFacility.VAB;
 
 		public void Save() {
 			ConfigNode _temp = ConfigNode.CreateConfigFromObject(this, new ConfigNode());
 			_temp.Save(FileConfig);
-			QuickStart.Log ("Settings Saved");
+			Log ("Settings Saved", "QSettings", true);
 		}
 		public void Load() {
 			if (File.Exists (FileConfig)) {
@@ -42,10 +60,11 @@ namespace QuickStart {
 				} catch {
 					Save ();
 				}
-				QuickStart.Log ("Settings Loaded");
+				Log ("Settings Loaded", "QSettings", true);
 			} else {
 				Save ();
 			}
+			isLoaded = true;
 		}
 	}
 }
