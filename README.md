@@ -34,11 +34,11 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
-v2.00 - 2016.05.20
+v2.00 - 2016.05.25
 * New: Re-added the start to VAB/SPH/TS/LastVessel,
 * New: Added a new setting parameter to wait after the loading of a scene (500ms by default),
 * New: Added a button to change the savegame to load,
-* New: Added a backup of the last scene used (if you crash in VAB, QuickStart will load the VAB)
+* New: Added a backup of the last scene used (if you crash in VAB, QuickStart will load the VAB),
 * New: Added an automatic backup of your ship in the editor (each 30 seconds),
 * New: Added the loading of the auto saved ship in the editor,
 * New: Added an automatic pause in flight when you start to last vessel,
