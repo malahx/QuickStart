@@ -34,7 +34,16 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
-v2.00 - 2016.05.25
+v2.00 - 2016.06.23
+* New: Added support of the activeVessel variable of the FLIGHTSTATE,
+* Fix: Corrected the name of the ScenarioModule to load,
+* Fix: Corrected the last vessel detection,
+* Fix: Hid all QuickStart text if QuickStart is disabled on the loading screen,
+* Fix: Enhanced the wait after the loading of a scene for player who has too many mods,
+* Fix: Corrected UI positions (again).
+* Compiled against KSP 1.1.3.1289
+
+v2.00 beta 1 - 2016.05.25
 * New: Re-added the start to VAB/SPH/TS/LastVessel,
 * New: Added a new setting parameter to wait after the loading of a scene (500ms by default),
 * New: Added a button to change the savegame to load,

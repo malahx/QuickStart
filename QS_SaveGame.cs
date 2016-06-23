@@ -101,6 +101,12 @@ namespace QuickStart {
 		}
 
 		private static bool vesselIsOK(ConfigNode node) {
+			if (node == null) {
+				return false;
+			}
+			if (!node.HasValue("type")) {
+				return false;
+			}
 			return node.GetValue("type") != VesselType.Debris.ToString() && node.GetValue("type") != VesselType.Flag.ToString() && node.GetValue("type") != VesselType.SpaceObject.ToString() && node.GetValue("type") != VesselType.Unknown.ToString();
 		}
 
@@ -115,63 +121,113 @@ namespace QuickStart {
 			if (saveGame != null) {
 				if (saveGame.HasNode ("GAME")) {
 					if (hasVesselNode) {
-						ConfigNode[] _vessels = saveGame.GetNode ("GAME").GetNode ("FLIGHTSTATE").GetNodes ("VESSEL");
-						var _vesselsSort = from _v in _vessels
-							orderby double.Parse(_v.GetValue("lct"))
-							select _v;
-						ConfigNode _lastVessel = _vesselsSort.Last (_v => vesselIsOK (_v));
+						ConfigNode _flightState = saveGame.GetNode ("GAME").GetNode ("FLIGHTSTATE");
+						ConfigNode[] _vessels = _flightState.GetNodes ("VESSEL");
+						ConfigNode _lastVessel = null;
+						if (_flightState.HasValue ("activeVessel")) {
+							try {
+								string _lastVesselIdx = _flightState.GetValue ("activeVessel");
+								_lastVessel = _flightState.GetNode ("VESSEL", int.Parse (_lastVesselIdx));
+								if (!vesselIsOK (_lastVessel)) {
+									_lastVessel = null;
+									Log ("No activeVessel found", "QSaveGame");
+								} else {
+									Log ("activeVessel found idx: " + _lastVesselIdx, "QSaveGame");
+								}
+							} catch (Exception e) {
+								Warning ("activeVessel not found: " + e, "QSaveGame");
+							}
+						} 
+						if (_lastVessel == null) {
+							try {
+								var _vesselsSort = from _v in _vessels
+								                   orderby double.Parse(_v.GetValue("lct"))
+								                   select _v;
+								if (_vesselsSort != null) {
+									_lastVessel = _vesselsSort.Last (_v => vesselIsOK (_v));
+									if (!vesselIsOK (_lastVessel)) {
+										_lastVessel = null;
+										Log ("No last launched vessel found", "QSaveGame");
+									} else {
+										Log ("Last launched vessel found", "QSaveGame");
+									}
+								}
+							} catch (Exception e) {
+								Warning ("Last launched vessel not found: " + e, "QSaveGame");
+							}
+						}
 						if (_lastVessel != null) {
 							QuickStart_Persistent.vesselID = _lastVessel.GetValue ("pid");
 							vesselName = _lastVessel.GetValue ("name");
 							vesselType = _lastVessel.GetValue ("type");
-							Log (string.Format ("lastVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
-						} else {
-							Log ("No lastVessel found", "QSaveGame");
-						}
-					}
-					ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNodes ("SCENARIO");
-					ConfigNode _node = Array.Find (_nodes, n => n.GetValue("name") == "QPersistent");
-					if (_node != null) {
-						if (hasVesselNode) {
-							if (_node.HasValue ("vesselID")) {
-								string _vesselName;
-								string _vesselType;
-								if (Exists (_node.GetValue ("vesselID"), out _vesselName, out _vesselType)) {
-									QuickStart_Persistent.vesselID = _node.GetValue ("vesselID");
-									vesselName = _vesselName;
-									vesselType = _vesselType;
-									Log (string.Format ("currentVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
-								} else {
-									Log ("currentVessel not exist", "QSaveGame");
-								}
+							if (!vesselIsOK (_lastVessel)) {
+								_lastVessel = null;
+								Log ("No lastVessel found (activeVessel or last launched vessel)", "QSaveGame");
 							} else {
-								Log ("No currentVessel found", "QSaveGame");
+								Log (string.Format ("lastVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
 							}
 						} else {
-							Log ("There's no vessel on this savegame", "QSaveGame");
+							Log ("No lastVessel found (activeVessel or last launched vessel)", "QSaveGame");
 						}
-					} else {
-						Log ("No Scenario found", "QSaveGame");
 					}
+					try {
+						ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNodes ("SCENARIO");
+						ConfigNode _node = Array.Find (_nodes, n => n.GetValue ("name") == "QuickStart_Persistent");
+						if (_node != null) {
+							if (hasVesselNode) {
+								if (_node.HasValue ("vesselID")) {
+									string _vesselName;
+									string _vesselType;
+									if (Exists (_node.GetValue ("vesselID"), out _vesselName, out _vesselType)) {
+										QuickStart_Persistent.vesselID = _node.GetValue ("vesselID");
+										vesselName = _vesselName;
+										vesselType = _vesselType;
+										Log (string.Format ("currentVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
+									} else {
+										Log ("currentVessel not exist", "QSaveGame");
+									}
+								} else {
+									Log ("No currentVessel found", "QSaveGame");
+								}
+							} else {
+								Log ("There's no vessel on this savegame", "QSaveGame");
+							}
+						} else {
+							Log ("No Scenario found", "QSaveGame");
+						}
+					} catch (Exception e) {
+						Warning ("currentVessel not found: " + e, "QSaveGame");
+					}
+				}
+			}
+			if (QuickStart_Persistent.vesselID == string.Empty) {
+				if (QSettings.Instance.gameScene == (int)GameScenes.FLIGHT) {
+					QSettings.Instance.gameScene = (int)GameScenes.SPACECENTER;
 				}
 			}
 			Log ("Savegame loaded: " + LastUsed, "QSaveGame");
 		}
 
-		private static bool Exists (string vesselID, out string vesselName, out string vesselType) {
-			vesselName = string.Empty;
-			vesselType = string.Empty;
-			if (hasVesselNode) {
-				ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNode ("FLIGHTSTATE").GetNodes ("VESSEL");
-				ConfigNode _node = Array.Find (_nodes, n => new Guid (n.GetValue ("pid")) == new Guid (vesselID));
-				if (_node != null) {
-					vesselName = _node.GetValue ("name");
-					vesselType = _node.GetValue ("type");
-					return true;
+		private static bool Exists (string vesselID, out string vName, out string vType) {
+			vName = string.Empty;
+			vType = string.Empty;
+			if (!string.IsNullOrEmpty(vesselID)) {
+				if (hasVesselNode) {
+					ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNode ("FLIGHTSTATE").GetNodes ("VESSEL");
+					ConfigNode _node = Array.Find (_nodes, n => new Guid (n.GetValue ("pid")) == new Guid (vesselID));
+					if (_node != null) {
+						if (!_node.HasValue ("name") || _node.HasValue("type")) {
+							return false;
+						}
+						vName = _node.GetValue ("name");
+						vType = _node.GetValue ("type");
+						return true;
+					}
 				}
 			}
 			return false;
 		}
+
 		private static bool hasVesselNode {
 			get {
 				if (saveGame != null) {

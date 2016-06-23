@@ -24,6 +24,7 @@ namespace QuickStart {
 
 	public partial class QMainMenu {
 
+		public bool Ready = false;
 		public static QMainMenu Instance {
 			get;
 			private set;
@@ -42,7 +43,7 @@ namespace QuickStart {
 		private void Start() {
 			if (!QSettings.Instance.Enabled) {
 				QuickStart.Log ("No need to keep it loaded.", "QMainMenu");
-				Destroy (this);
+				DestroyThis ();
 				return;
 			}
 			StartCoroutine (QStart ());
@@ -50,10 +51,20 @@ namespace QuickStart {
 		}
 
 		private IEnumerator QStart() {
-			if (string.IsNullOrEmpty (QSaveGame.LastUsed) || !QSettings.Instance.Enabled) {
-				Destroy (this);
+			if (string.IsNullOrEmpty (QSaveGame.LastUsed)) {
+				QuickStart.Warning ("Last savegame not found!", "QMainMenu");
+				DestroyThis ();
 				yield break;
 			}
+			if (!QSettings.Instance.Enabled) {
+				QuickStart.Log ("QuickStart is disabled!", "QMainMenu");
+				DestroyThis ();
+				yield break;
+			}
+			while (!Ready) {
+				yield return 0;
+			}
+			yield return new WaitForEndOfFrame ();
 			yield return new WaitForSeconds (QSettings.Instance.WaitLoading);
 			yield return new WaitForEndOfFrame ();
 			QuickStart.Log ("MainMenu Loaded", "QMainMenu");
@@ -72,8 +83,21 @@ namespace QuickStart {
 				yield break;
 			}
 			QuickStart.Warning ("Can't load the last save game", "QMainMenu");
-			Destroy (this);
+			DestroyThis ();
 			yield break;
+		}
+
+		private void LateUpdate() {
+			if (!Ready) {
+				QuickStart.Log ("Ready", "QMainMenu");
+				Ready = true;
+			}
+		}
+
+		private void DestroyThis() {
+			QuickStart.Log ("DestroyThis", "QMainMenu");
+			QuickStart_Persistent.vesselID = string.Empty;
+			Destroy (this);
 		}
 
 		private void OnDestroy() {

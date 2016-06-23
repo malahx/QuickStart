@@ -23,7 +23,9 @@ using UnityEngine;
 
 namespace QuickStart {
 	public partial class QSpaceCenter {
-		
+
+		public bool Ready = false;
+
 		public static QSpaceCenter Instance {
 			get;
 			private set;
@@ -51,6 +53,10 @@ namespace QuickStart {
 		}
 
 		private IEnumerator QStart() {
+			while (!Ready || !QuickStart_Persistent.Ready) {
+				yield return 0;
+			}
+			yield return new WaitForEndOfFrame ();
 			yield return new WaitForSeconds (QSettings.Instance.WaitLoading);
 			yield return new WaitForEndOfFrame ();
 			QuickStart.Log ("SpaceCenter Loaded", "QSpaceCenter");
@@ -58,6 +64,16 @@ namespace QuickStart {
 				string _saveGame = GamePersistence.SaveGame (HighLogic.CurrentGame, QSaveGame.File, HighLogic.SaveFolder, SaveMode.OVERWRITE);
 				if (!string.IsNullOrEmpty (QuickStart_Persistent.vesselID)) {
 					int _idx = HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv.vesselID == QuickStart_Persistent.VesselID);
+					QuickStart.Warning ("QuickStart_Persistent.VesselID " + QuickStart_Persistent.VesselID);
+					QuickStart.Warning ("QuickStart_Persistent.vesselID " + QuickStart_Persistent.vesselID);
+					foreach (ProtoVessel pv in HighLogic.CurrentGame.flightState.protoVessels) {
+						QuickStart.Warning (pv.vesselName + " pv.vesselID " + pv.vesselID);
+						QuickStart.Warning (pv.vesselName + "pv.vesselID.ToString() " + pv.vesselID.ToString());
+					}
+					foreach (Vessel v in FlightGlobals.Vessels) {
+						QuickStart.Warning (v.vesselName + "v.id " + v.id);
+						QuickStart.Warning (v.vesselName + "v.id.ToString() " + v.id.ToString());
+					}
 					if (_idx != -1) {
 						QuickStart.Log (string.Format("StartAndFocusVessel: {0}({1})[{2}] idx: {3}", QSaveGame.vesselName, QSaveGame.vesselType, QuickStart_Persistent.vesselID, _idx), "QSpaceCenter");
 						FlightDriver.StartAndFocusVessel (_saveGame, _idx);
@@ -75,8 +91,6 @@ namespace QuickStart {
 				QuickStart.Log ("Goto Tracking Station", "QSpaceCenter");
 			}
 			if (QSettings.Instance.gameScene == (int)GameScenes.EDITOR) {
-				QuickStart.Log ("QPersistent.shipPath " + QuickStart_Persistent.shipPath);
-				QuickStart.Log ("File.Exists " + File.Exists (QuickStart_Persistent.shipPath));
 				if (QSettings.Instance.enableEditorLoadAutoSave && File.Exists (QuickStart_Persistent.shipPath)) {
 					EditorDriver.StartAndLoadVessel(QuickStart_Persistent.shipPath, (EditorFacility)QSettings.Instance.editorFacility);
 					QuickStart.Log ("StartAndLoadVessel: " + QuickStart_Persistent.shipPath, "QSpaceCenter");
@@ -90,6 +104,13 @@ namespace QuickStart {
 			}
 			Destroy (this);
 			yield break;
+		}
+
+		private void LateUpdate() {
+			if (!Ready) {
+				QuickStart.Log ("Ready", "QSpaceCenter");
+				Ready = true;
+			}
 		}
 
 		private void OnDestroy() {

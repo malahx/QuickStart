@@ -25,8 +25,13 @@ namespace QuickStart {
 
 	public partial class QLoading {
 
-		private Rect RectGUI;
 		private GUIStyle Button;
+
+		private Rect RectGUI {
+			get {
+				return new Rect (0, Screen.height - 200, Screen.width, 200);
+			}
+		}
 
 		public static QLoading Instance {
 			get;
@@ -47,7 +52,6 @@ namespace QuickStart {
 		}
 
 		private void Start() {
-			RectGUI = new Rect (0, Screen.height - 200, Screen.width, 200);
 			QuickStart.Log ("Start", "QLoading");
 		}
 
@@ -69,9 +73,11 @@ namespace QuickStart {
 			GUILayout.FlexibleSpace ();
 			GUILayout.BeginHorizontal ();
 			GUILayout.FlexibleSpace ();
-			GUILayout.Label (string.Format ("[{0}] {1}", QuickStart.MOD, (!string.IsNullOrEmpty (QSaveGame.LastUsed) ? "Last game found: <color=white><b>" + QSaveGame.LastUsed + "</b></color>" : "<b><color=#000000>No last game found</color></b>")));
-			if (GUILayout.Button ("►", Button, GUILayout.Width(20), GUILayout.Height(20))) {
-				QSaveGame.Next ();
+			if (QSettings.Instance.Enabled) {
+				GUILayout.Label (string.Format ("[{0}] {1}", QuickStart.MOD, (!string.IsNullOrEmpty (QSaveGame.LastUsed) ? "Last game found: <color=white><b>" + QSaveGame.LastUsed + "</b></color>" : "<b><color=#000000>No last game found</color></b>")));
+				if (GUILayout.Button ("►", Button, GUILayout.Width (20), GUILayout.Height (20))) {
+					QSaveGame.Next ();
+				}
 			}
 			GUILayout.FlexibleSpace ();
 			GUILayout.EndHorizontal ();
