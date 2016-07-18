@@ -34,6 +34,12 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v2.01 - 2016.07.18
+* Fix: Corrected Last vessel found,
+* Fix: Deleted useless libraries,
+* Fix: Deleted Linq library,
+* Fix: Deleted useless debug informations.
+
 v2.00 - 2016.06.23
 * New: Added support of the activeVessel variable of the FLIGHTSTATE,
 * Fix: Corrected the name of the ScenarioModule to load,

@@ -17,11 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using UnityEngine;
 
 namespace QuickStart {
 	
@@ -53,6 +49,15 @@ namespace QuickStart {
 			"training"
 		};
 
+		private static bool isBlackList(string game) {
+			for (int _i = gameBlackList.Length - 1; _i >= 0; --_i) {
+				if (gameBlackList[_i] == game) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private static int indexSave = -1;
 		[KSPField(isPersistant = true)]	private static string lastUsed;
 		public static string LastUsed {
@@ -61,9 +66,10 @@ namespace QuickStart {
 					DateTime _lastWriteTime = DateTime.MinValue;
 					string _lastDirectoryUsed = string.Empty;
 					DirectoryInfo[] _directories = new DirectoryInfo (Folder).GetDirectories ();
-					for (int _i = 0; _i < _directories.Length; _i++) {
-						DirectoryInfo _directory = _directories [_i];
+					for (int _i = _directories.Length - 1; _i >= 0; --_i) {
+						DirectoryInfo _directory = _directories[_i];
 						FileInfo[] _files = _directory.GetFiles ();
+
 						FileInfo _file = Array.Find (_files, f => f.Name == File + Ext);
 						if (_file != null) {
 							if (_file.LastWriteTime > _lastWriteTime) {
@@ -73,7 +79,7 @@ namespace QuickStart {
 							}
 						}
 					}
-					if (string.IsNullOrEmpty (_lastDirectoryUsed) || gameBlackList.Contains (_lastDirectoryUsed)) {
+					if (string.IsNullOrEmpty (_lastDirectoryUsed) || isBlackList(_lastDirectoryUsed)) {
 						_lastDirectoryUsed = string.Empty;
 					}
 					lastUsed = _lastDirectoryUsed;
@@ -86,12 +92,12 @@ namespace QuickStart {
 
 		public static void Next() {
 			DirectoryInfo[] _directories = new DirectoryInfo (Folder).GetDirectories ();
-			for (int _i = 0; _i < _directories.Length; _i++) {
+			for (int _i = _directories.Length - 1; _i >= 0; --_i) {
 				indexSave++;
 				if (indexSave >= _directories.Length) {
 					indexSave = 0;
 				}
-				if (!gameBlackList.Contains (_directories [indexSave].Name)) {
+				if (!isBlackList (_directories [indexSave].Name)) {
 					break;
 				}
 			}
@@ -125,35 +131,33 @@ namespace QuickStart {
 						ConfigNode[] _vessels = _flightState.GetNodes ("VESSEL");
 						ConfigNode _lastVessel = null;
 						if (_flightState.HasValue ("activeVessel")) {
-							try {
-								string _lastVesselIdx = _flightState.GetValue ("activeVessel");
-								_lastVessel = _flightState.GetNode ("VESSEL", int.Parse (_lastVesselIdx));
-								if (!vesselIsOK (_lastVessel)) {
-									_lastVessel = null;
-									Log ("No activeVessel found", "QSaveGame");
-								} else {
-									Log ("activeVessel found idx: " + _lastVesselIdx, "QSaveGame");
-								}
-							} catch (Exception e) {
-								Warning ("activeVessel not found: " + e, "QSaveGame");
+							string _lastVesselIdx = _flightState.GetValue ("activeVessel");
+							_lastVessel = _flightState.GetNode ("VESSEL", int.Parse (_lastVesselIdx));
+							if (!vesselIsOK (_lastVessel)) {
+								_lastVessel = null;
+								Log ("No activeVessel found", "QSaveGame");
 							}
-						} 
+							else {
+								Log ("activeVessel found idx: " + _lastVesselIdx, "QSaveGame");
+							}
+						}
 						if (_lastVessel == null) {
-							try {
-								var _vesselsSort = from _v in _vessels
-								                   orderby double.Parse(_v.GetValue("lct"))
-								                   select _v;
-								if (_vesselsSort != null) {
-									_lastVessel = _vesselsSort.Last (_v => vesselIsOK (_v));
-									if (!vesselIsOK (_lastVessel)) {
-										_lastVessel = null;
-										Log ("No last launched vessel found", "QSaveGame");
-									} else {
-										Log ("Last launched vessel found", "QSaveGame");
+							double _lastLCT = 0;
+							for (int _i = _vessels.Length - 1; _i >= 0; --_i) {
+								ConfigNode _vessel = _vessels[_i];
+								if (_vessel.HasValue ("lct") && vesselIsOK (_vessel)) {
+									double _lct = double.Parse (_vessel.GetValue ("lct"));
+									if (_lct > _lastLCT) {
+										_lastVessel = _vessel;
+										_lastLCT = _lct;
 									}
 								}
-							} catch (Exception e) {
-								Warning ("Last launched vessel not found: " + e, "QSaveGame");
+							}
+							if (_lastVessel == null) {
+								Log ("No last launched vessel found", "QSaveGame");
+							}
+							else {
+								Log ("Last launched vessel found", "QSaveGame");
 							}
 						}
 						if (_lastVessel != null) {
@@ -163,40 +167,42 @@ namespace QuickStart {
 							if (!vesselIsOK (_lastVessel)) {
 								_lastVessel = null;
 								Log ("No lastVessel found (activeVessel or last launched vessel)", "QSaveGame");
-							} else {
+							}
+							else {
 								Log (string.Format ("lastVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
 							}
-						} else {
+						}
+						else {
 							Log ("No lastVessel found (activeVessel or last launched vessel)", "QSaveGame");
 						}
 					}
-					try {
-						ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNodes ("SCENARIO");
-						ConfigNode _node = Array.Find (_nodes, n => n.GetValue ("name") == "QuickStart_Persistent");
-						if (_node != null) {
-							if (hasVesselNode) {
-								if (_node.HasValue ("vesselID")) {
-									string _vesselName;
-									string _vesselType;
-									if (Exists (_node.GetValue ("vesselID"), out _vesselName, out _vesselType)) {
-										QuickStart_Persistent.vesselID = _node.GetValue ("vesselID");
-										vesselName = _vesselName;
-										vesselType = _vesselType;
-										Log (string.Format ("currentVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
-									} else {
-										Log ("currentVessel not exist", "QSaveGame");
-									}
-								} else {
-									Log ("No currentVessel found", "QSaveGame");
+					ConfigNode[] _nodes = saveGame.GetNode ("GAME").GetNodes ("SCENARIO");
+					ConfigNode _node = Array.Find (_nodes, n => n.GetValue ("name") == "QuickStart_Persistent");
+					if (_node != null) {
+						if (hasVesselNode) {
+							if (_node.HasValue ("vesselID")) {
+								string _vesselName;
+								string _vesselType;
+								if (Exists (_node.GetValue ("vesselID"), out _vesselName, out _vesselType)) {
+									QuickStart_Persistent.vesselID = _node.GetValue ("vesselID");
+									vesselName = _vesselName;
+									vesselType = _vesselType;
+									Log (string.Format ("currentVessel: {0}({1})[{2}]", vesselName, vesselType, QuickStart_Persistent.vesselID), "QSaveGame");
 								}
-							} else {
-								Log ("There's no vessel on this savegame", "QSaveGame");
+								else {
+									Log ("currentVessel not exist", "QSaveGame");
+								}
 							}
-						} else {
-							Log ("No Scenario found", "QSaveGame");
+							else {
+								Log ("No currentVessel found", "QSaveGame");
+							}
 						}
-					} catch (Exception e) {
-						Warning ("currentVessel not found: " + e, "QSaveGame");
+						else {
+							Log ("There's no vessel on this savegame", "QSaveGame");
+						}
+					}
+					else {
+						Log ("No Scenario found", "QSaveGame");
 					}
 				}
 			}

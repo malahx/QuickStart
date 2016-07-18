@@ -16,9 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace QuickStart {
@@ -52,6 +49,12 @@ namespace QuickStart {
 		}
 
 		private void Start() {
+			if (string.IsNullOrEmpty (QSaveGame.LastUsed)) {
+				ScreenMessages.PostScreenMessage ("[" + QuickStart.MOD + "]: No savegame found.", 10);
+				QuickStart.Log ("No savegame found, destroy...", "QLoading");
+				Destroy (this);
+				return;
+			}
 			QuickStart.Log ("Start", "QLoading");
 		}
 

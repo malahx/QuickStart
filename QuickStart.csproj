@@ -67,9 +67,6 @@
     <Reference Include="KSPUtil">
       <HintPath>..\lib\Managed\KSPUtil.dll</HintPath>
     </Reference>
-    <Reference Include="System">
-      <HintPath>..\lib\Managed\System.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\lib\Managed\UnityEngine.dll</HintPath>
     </Reference>

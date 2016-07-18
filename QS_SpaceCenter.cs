@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -64,16 +63,6 @@ namespace QuickStart {
 				string _saveGame = GamePersistence.SaveGame (HighLogic.CurrentGame, QSaveGame.File, HighLogic.SaveFolder, SaveMode.OVERWRITE);
 				if (!string.IsNullOrEmpty (QuickStart_Persistent.vesselID)) {
 					int _idx = HighLogic.CurrentGame.flightState.protoVessels.FindLastIndex (pv => pv.vesselID == QuickStart_Persistent.VesselID);
-					QuickStart.Warning ("QuickStart_Persistent.VesselID " + QuickStart_Persistent.VesselID);
-					QuickStart.Warning ("QuickStart_Persistent.vesselID " + QuickStart_Persistent.vesselID);
-					foreach (ProtoVessel pv in HighLogic.CurrentGame.flightState.protoVessels) {
-						QuickStart.Warning (pv.vesselName + " pv.vesselID " + pv.vesselID);
-						QuickStart.Warning (pv.vesselName + "pv.vesselID.ToString() " + pv.vesselID.ToString());
-					}
-					foreach (Vessel v in FlightGlobals.Vessels) {
-						QuickStart.Warning (v.vesselName + "v.id " + v.id);
-						QuickStart.Warning (v.vesselName + "v.id.ToString() " + v.id.ToString());
-					}
 					if (_idx != -1) {
 						QuickStart.Log (string.Format("StartAndFocusVessel: {0}({1})[{2}] idx: {3}", QSaveGame.vesselName, QSaveGame.vesselType, QuickStart_Persistent.vesselID, _idx), "QSpaceCenter");
 						FlightDriver.StartAndFocusVessel (_saveGame, _idx);
