@@ -22,6 +22,8 @@ namespace QuickStart {
 
 	public partial class QLoading {
 
+		[KSPField (isPersistant = true)] public static bool Ended = false;
+
 		private GUIStyle Button;
 
 		private Rect RectGUI {
@@ -36,6 +38,17 @@ namespace QuickStart {
 		}
 
 		private void Awake() {
+			if (Ended) {
+				QuickStart.Warning ("Reload? Destroy.", "QLoading");
+				Destroy (this);
+				return;
+			}
+			if (HighLogic.LoadedScene != GameScenes.LOADING) {
+				QuickStart.Warning ("It's not a real Loading? Destroy.", "QLoading");
+				Ended = true;
+				Destroy (this);
+				return;
+			}
 			if (Instance != null) {
 				QuickStart.Warning ("There's already an Instance", "QLoading");
 				Destroy (this);
@@ -52,6 +65,7 @@ namespace QuickStart {
 			if (string.IsNullOrEmpty (QSaveGame.LastUsed)) {
 				ScreenMessages.PostScreenMessage ("[" + QuickStart.MOD + "]: No savegame found.", 10);
 				QuickStart.Log ("No savegame found, destroy...", "QLoading");
+				Ended = true;
 				Destroy (this);
 				return;
 			}

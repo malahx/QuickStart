@@ -31,6 +31,11 @@ namespace QuickStart {
 		}
 
 		private void Awake() {
+			if (QLoading.Ended) {
+				QuickStart.Warning ("Reload? Destroy.", "QSpaceCenter");
+				Destroy (this);
+				return;
+			}
 			if (Instance != null) {
 				QuickStart.Warning ("There's already an Instance", "QSpaceCenter");
 				Destroy (this);
@@ -44,6 +49,7 @@ namespace QuickStart {
 			InputLockManager.RemoveControlLock("applicationFocus");
 			if (!QSettings.Instance.Enabled || QSettings.Instance.gameScene == (int)GameScenes.SPACECENTER) {
 				QuickStart.Log ("Not need to keep it loaded.", "QSpaceCenter");
+				QLoading.Ended = true;
 				Destroy (this);
 				return;
 			}
@@ -68,9 +74,11 @@ namespace QuickStart {
 						FlightDriver.StartAndFocusVessel (_saveGame, _idx);
 					} else {
 						QuickStart.Warning ("QStart: invalid idx", "QSpaceCenter");
+						DestroyThis ();
 					}
 				} else {
 					QuickStart.Warning ("QStart: No vessel found", "QSpaceCenter");
+					DestroyThis ();
 				}
 			}
 			if (QSettings.Instance.gameScene == (int)GameScenes.TRACKSTATION) {
@@ -78,6 +86,7 @@ namespace QuickStart {
 				HighLogic.LoadScene (GameScenes.TRACKSTATION);
 				InputLockManager.ClearControlLocks ();
 				QuickStart.Log ("Goto Tracking Station", "QSpaceCenter");
+				DestroyThis ();
 			}
 			if (QSettings.Instance.gameScene == (int)GameScenes.EDITOR) {
 				if (QSettings.Instance.enableEditorLoadAutoSave && File.Exists (QuickStart_Persistent.shipPath)) {
@@ -90,6 +99,7 @@ namespace QuickStart {
 				}
 				InputLockManager.ClearControlLocks ();
 				QuickStart.Log ("Goto " + (QSettings.Instance.editorFacility == (int)EditorFacility.VAB ? "Vehicle Assembly Building" : "Space Plane Hangar"), "QSpaceCenter");
+				DestroyThis ();
 			}
 			Destroy (this);
 			yield break;
@@ -104,6 +114,12 @@ namespace QuickStart {
 
 		private void OnDestroy() {
 			QuickStart.Log ("OnDestroy", "QSpaceCenter");
+		}
+
+		private void DestroyThis() {
+			QuickStart.Log ("DestroyThis", "QSpaceCenter");
+			QLoading.Ended = true;
+			Destroy (this);
 		}
 	}
 }

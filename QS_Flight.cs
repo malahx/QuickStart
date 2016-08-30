@@ -25,8 +25,14 @@ namespace QuickStart {
 		}
 
 		private void Awake() {
+			if (QLoading.Ended) {
+				QuickStart.Warning ("Reload? Destroy.", "QLoading");
+				Destroy (this);
+				return;
+			}
 			if (!QSettings.Instance.enablePauseOnFlight || !QSettings.Instance.Enabled || QSettings.Instance.gameScene != (int)GameScenes.FLIGHT) {
 				QuickStart.Log ("Not need to keep it loaded.", "QFlight");
+				QLoading.Ended = true;
 				Destroy (this);
 				return;
 			}
@@ -51,6 +57,10 @@ namespace QuickStart {
 
 		private void OnFlightReady() {
 			PauseMenu.Display ();
+			QLoading.Ended = true;
+			QuickStart.Log ("Not need to keep it loaded.", "QFlight");
+			Destroy (this);
+			return;
 		}
 	}
 }

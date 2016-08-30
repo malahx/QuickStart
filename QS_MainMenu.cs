@@ -30,6 +30,11 @@ namespace QuickStart {
 		}
 
 		private void Awake() {
+			if (QLoading.Ended) {
+				QuickStart.Warning ("Reload? Destroy.", "QMainMenu");
+				Destroy (this);
+				return;
+			}
 			if (Instance != null) {
 				QuickStart.Warning ("There's already an Instance", "QMainMenu");
 				Destroy (this);
@@ -96,6 +101,7 @@ namespace QuickStart {
 		private void DestroyThis() {
 			QuickStart.Log ("DestroyThis", "QMainMenu");
 			QuickStart_Persistent.vesselID = string.Empty;
+			QLoading.Ended = true;
 			Destroy (this);
 		}
 
