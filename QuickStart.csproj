@@ -62,13 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\lib\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="KSPUtil">
-      <HintPath>..\lib\Managed\KSPUtil.dll</HintPath>
+      <HintPath>..\lib\1.0.5.1028 OLD\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\lib\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\lib\1.0.5.1028 OLD\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
