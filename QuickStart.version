@@ -2,11 +2,11 @@
 	"NAME"				: "QuickStart",
 	"URL"				: "https://raw.githubusercontent.com/malahx/QuickStart/master/QuickStart.version",
 	"CHANGE_LOG_URL"		: "https://raw.githubusercontent.com/malahx/QuickStart/master/README.md", 
-	"DOWNLOAD"			: "https://github.com/malahx/QuickStart/releases",
+	"DOWNLOAD"			: "http://spacedock.info/mod/110/QuickStart",
 	"VERSION": {
 		"MAJOR"			: 2,
 		"MINOR"			: 0,
-		"PATCH"			: 1,
+		"PATCH"			: 2,
 		"BUILD"			: 0
 	},
 	"KSP_VERSION": {

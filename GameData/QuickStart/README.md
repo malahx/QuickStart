@@ -34,7 +34,7 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
-v2.02 - 2016.08.30
+v2.02-113 - 2016.08.30
 * Fix: Corrected the reload database (thanks Fwiffo & Stone Blue).
 
 v2.01 - 2016.07.18
