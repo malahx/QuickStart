@@ -28,7 +28,7 @@ namespace QuickStart {
 
 		private Rect RectGUI {
 			get {
-				return new Rect (0, Screen.height - 200, Screen.width, 200);
+				return new Rect (0, Screen.height - 50, Screen.width, 50);
 			}
 		}
 
@@ -87,16 +87,13 @@ namespace QuickStart {
 			GUI.skin = HighLogic.Skin;
 			GUILayout.BeginArea (RectGUI);
 			GUILayout.BeginVertical ();
-			GUILayout.FlexibleSpace ();
 			GUILayout.BeginHorizontal ();
-			GUILayout.FlexibleSpace ();
 			if (QSettings.Instance.Enabled) {
 				GUILayout.Label (string.Format ("[{0}] {1}", QuickStart.MOD, (!string.IsNullOrEmpty (QSaveGame.LastUsed) ? "Last game found: <color=white><b>" + QSaveGame.LastUsed + "</b></color>" : "<b><color=#000000>No last game found</color></b>")));
 				if (GUILayout.Button ("►", Button, GUILayout.Width (20), GUILayout.Height (20))) {
 					QSaveGame.Next ();
 				}
 			}
-			GUILayout.FlexibleSpace ();
 			GUILayout.EndHorizontal ();
 			if (!string.IsNullOrEmpty (QSaveGame.LastUsed)) {
 				GUILayout.BeginHorizontal ();

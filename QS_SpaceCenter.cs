@@ -62,7 +62,7 @@ namespace QuickStart {
 				yield return 0;
 			}
 			yield return new WaitForEndOfFrame ();
-			yield return new WaitForSeconds (QSettings.Instance.WaitLoading);
+			yield return new WaitForSecondsRealtime (QSettings.Instance.WaitLoading);
 			yield return new WaitForEndOfFrame ();
 			QuickStart.Log ("SpaceCenter Loaded", "QSpaceCenter");
 			if (QSettings.Instance.gameScene == (int)GameScenes.FLIGHT) {

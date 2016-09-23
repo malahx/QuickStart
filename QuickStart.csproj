@@ -64,9 +64,6 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\lib\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="KSPUtil">
-      <HintPath>..\lib\Managed\KSPUtil.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\lib\Managed\UnityEngine.dll</HintPath>
     </Reference>
