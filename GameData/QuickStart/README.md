@@ -34,8 +34,11 @@ Delete the QuickStart folder in your KSP/GameData folder.
 
 #### Changelog
 
+v2.04 - 2016.10.14
+* Compiled against KSP 1.2.0.1586
+
 v2.03 - 2016.09.23
-* Fix: Move text,
+* Fix: Text Moved,
 * Compiled against KSP 1.2.0.1523
 
 v2.02-113 - 2016.08.30
